@@ -17,6 +17,8 @@ limitations under the License.
 package routes
 
 import (
+	"strings"
+
 	restful "github.com/emicklei/go-restful"
 	"k8s.io/klog/v2"
 
@@ -44,6 +46,18 @@ func (oa OpenAPI) InstallV2(c *restful.Container, mux *mux.PathRecorderMux) (*ha
 	openAPIVersionedService, err := handler.NewOpenAPIService(spec)
 	if err != nil {
 		klog.Fatalf("Failed to create OpenAPIService: %v", err)
+	}
+
+	// we shadow ClustResourceQuotas, RoleBindingRestrictions, and SecurityContextContstraints
+	// with a CRD. This loop removes all CRQ,RBR, SCC paths
+	// from the OpenAPI spec such that they don't conflict with the CRD
+	// apiextensions-apiserver spec during merging.
+	for pth := range spec.Paths.Paths {
+		if strings.HasPrefix(pth, "/apis/quota.openshift.io/v1/clusterresourcequotas") ||
+			strings.Contains(pth, "rolebindingrestrictions") ||
+			strings.HasPrefix(pth, "/apis/security.openshift.io/v1/securitycontextconstraints") {
+			delete(spec.Paths.Paths, pth)
+		}
 	}
 
 	err = openAPIVersionedService.RegisterOpenAPIVersionedService("/openapi/v2", mux)
