@@ -66,7 +66,7 @@ func (s *SecureServingInfo) Serve(handler http.Handler, shutdownTimeout time.Dur
 		if err := os.Setenv("GODEBUG", "http2server=0"); err != nil {
 			return nil, err
 		}
-		baseTLSConfig.NextProtos = []string{"http/1.1"}
+		secureServer.TLSConfig.NextProtos = []string{"http/1.1"}
 	}
 
 	if s.MinTLSVersion > 0 {
