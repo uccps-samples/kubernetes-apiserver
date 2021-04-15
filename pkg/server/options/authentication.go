@@ -211,7 +211,7 @@ func NewDelegatingAuthenticationOptions() *DelegatingAuthenticationOptions {
 			ExtraHeaderPrefixes: []string{"x-remote-extra-"},
 		},
 		WebhookRetryBackoff: DefaultAuthWebhookRetryBackoff(),
-		ClientTimeout:       10 * time.Second,
+		TokenRequestTimeout: 10 * time.Second,
 	}
 }
 
@@ -220,9 +220,9 @@ func (s *DelegatingAuthenticationOptions) WithCustomRetryBackoff(backoff wait.Ba
 	s.WebhookRetryBackoff = &backoff
 }
 
-// WithClientTimeout sets the given timeout for the authentication webhook client.
-func (s *DelegatingAuthenticationOptions) WithClientTimeout(timeout time.Duration) {
-	s.ClientTimeout = timeout
+// WithRequestTimeout sets the given timeout for requests made by the authentication webhook client.
+func (s *DelegatingAuthenticationOptions) WithRequestTimeout(timeout time.Duration) {
+	s.TokenRequestTimeout = timeout
 }
 
 func (s *DelegatingAuthenticationOptions) Validate() []error {
@@ -274,9 +274,10 @@ func (s *DelegatingAuthenticationOptions) ApplyTo(authenticationInfo *server.Aut
 	}
 
 	cfg := authenticatorfactory.DelegatingAuthenticatorConfig{
-		Anonymous:           true,
-		CacheTTL:            s.CacheTTL,
-		WebhookRetryBackoff: s.WebhookRetryBackoff,
+		Anonymous:                true,
+		CacheTTL:                 s.CacheTTL,
+		WebhookRetryBackoff:      s.WebhookRetryBackoff,
+		TokenAccessReviewTimeout: s.TokenRequestTimeout,
 	}
 
 	client, err := s.getClient()
