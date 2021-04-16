@@ -195,9 +195,9 @@ type DelegatingAuthenticationOptions struct {
 	// before we fail the webhook call in order to limit the fan out that ensues when the system is degraded.
 	WebhookRetryBackoff *wait.Backoff
 
-	// ClientTimeout specifies a time limit for requests made by the authorization webhook client.
+	// TokenRequestTimeout specifies a time limit for requests made by the authorization webhook client.
 	// The default value is set to 10 seconds.
-	ClientTimeout time.Duration
+	TokenRequestTimeout time.Duration
 }
 
 func NewDelegatingAuthenticationOptions() *DelegatingAuthenticationOptions {
@@ -420,7 +420,10 @@ func (s *DelegatingAuthenticationOptions) getClient() (kubernetes.Interface, err
 	// set high qps/burst limits since this will effectively limit API server responsiveness
 	clientConfig.QPS = 200
 	clientConfig.Burst = 400
-	clientConfig.Timeout = s.ClientTimeout
+	// do not set a timeout on the http client, instead use context for cancellation
+	// if multiple timeouts were set, the request will pick the smaller timeout to be applied, leaving other useless.
+	//
+	// see https://github.com/golang/go/blob/a937729c2c2f6950a32bc5cd0f5b88700882f078/src/net/http/client.go#L364
 
 	return kubernetes.NewForConfig(clientConfig)
 }
