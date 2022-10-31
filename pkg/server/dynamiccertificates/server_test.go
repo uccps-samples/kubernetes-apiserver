@@ -54,7 +54,7 @@ func TestServingCert(t *testing.T) {
 		{
 			host:  "172.30.0.1",
 			ips:   []string{"172.30.0.1"},
-			names: []string{"openshift", "openshift.default.svc.cluster.local"},
+			names: []string{"uccp", "uccp.default.svc.cluster.local"},
 		},
 		{
 			host:  "127.0.0.1",
@@ -64,7 +64,7 @@ func TestServingCert(t *testing.T) {
 		{
 			host:  "2001:abcd:bcda::1",
 			ips:   []string{"2001:abcd:bcda::1"},
-			names: []string{"openshiftv6", "openshiftv6.default.svc.cluster.local"},
+			names: []string{"uccpv6", "uccpv6.default.svc.cluster.local"},
 		},
 	}
 
@@ -142,12 +142,12 @@ func TestServingCert(t *testing.T) {
 		},
 		{
 			name:       "service by dns",
-			serverName: "openshift",
+			serverName: "uccp",
 			expected:   []byte(strings.TrimSpace(string(expectedServiceCertBytes))),
 		},
 		{
 			name:       "service v6 by dns",
-			serverName: "openshiftv6",
+			serverName: "uccpv6",
 			expected:   []byte(strings.TrimSpace(string(expectedServiceV6CertBytes))),
 		},
 		{

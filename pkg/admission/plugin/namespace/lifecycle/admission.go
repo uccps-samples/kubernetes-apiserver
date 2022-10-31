@@ -56,13 +56,13 @@ func Register(plugins *admission.Plugins) {
 	plugins.Register(PluginName, func(config io.Reader) (admission.Interface, error) {
 		return NewLifecycle(sets.NewString(metav1.NamespaceDefault, metav1.NamespaceSystem, metav1.NamespacePublic,
 			// user specified configuration that cannot be rebuilt
-			"openshift-config",
+			"uccp-config",
 			// cluster generated configuration that cannot be rebuilt (etcd encryption keys)
-			"openshift-config-managed",
+			"uccp-config-managed",
 			// the CVO which is the root we use to rebuild all the rest
-			"openshift-cluster-version",
+			"uccp-cluster-version",
 			// contains a namespaced list of all nodes in the cluster (yeah, weird.  they do it for multi-tenant management I think?)
-			"openshift-machine-api",
+			"uccp-machine-api",
 		))
 	})
 }
@@ -235,12 +235,12 @@ func (l *Lifecycle) ValidateInitialization() error {
 // resources because returning "not found" errors allows someone to search for the "people I'm going to fire in 2017" namespace.
 var accessReviewResources = map[schema.GroupResource]bool{
 	{Group: "authorization.k8s.io", Resource: "localsubjectaccessreviews"}:                            true,
-	schema.GroupResource{Group: "authorization.openshift.io", Resource: "subjectaccessreviews"}:       true,
-	schema.GroupResource{Group: "authorization.openshift.io", Resource: "localsubjectaccessreviews"}:  true,
-	schema.GroupResource{Group: "authorization.openshift.io", Resource: "resourceaccessreviews"}:      true,
-	schema.GroupResource{Group: "authorization.openshift.io", Resource: "localresourceaccessreviews"}: true,
-	schema.GroupResource{Group: "authorization.openshift.io", Resource: "selfsubjectrulesreviews"}:    true,
-	schema.GroupResource{Group: "authorization.openshift.io", Resource: "subjectrulesreviews"}:        true,
+	schema.GroupResource{Group: "authorization.uccp.io", Resource: "subjectaccessreviews"}:       true,
+	schema.GroupResource{Group: "authorization.uccp.io", Resource: "localsubjectaccessreviews"}:  true,
+	schema.GroupResource{Group: "authorization.uccp.io", Resource: "resourceaccessreviews"}:      true,
+	schema.GroupResource{Group: "authorization.uccp.io", Resource: "localresourceaccessreviews"}: true,
+	schema.GroupResource{Group: "authorization.uccp.io", Resource: "selfsubjectrulesreviews"}:    true,
+	schema.GroupResource{Group: "authorization.uccp.io", Resource: "subjectrulesreviews"}:        true,
 }
 
 func isAccessReview(a admission.Attributes) bool {
